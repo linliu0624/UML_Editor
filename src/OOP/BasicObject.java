@@ -14,12 +14,13 @@ public class BasicObject extends AllShape {
 	// private ImageIcon imageIcon;
 
 	protected Canvas canvas;
+	private boolean seleced = false;
 	private String type = "";
 	private int depth;
 	private int posX, posY;
 	private int width, height;
 	private int origin = 5;
-	private HashMap<String, Integer[]> fourPos = new HashMap<String, Integer[]>();
+	private HashMap<String, Integer[]> fourPart = new HashMap<String, Integer[]>();
 
 	public BasicObject(String type, Canvas canvas, int depth, int posX, int posY, int width, int height) {
 		super(canvas, depth);
@@ -30,10 +31,10 @@ public class BasicObject extends AllShape {
 		this.width = width;
 		this.height = height;
 		this.type = type;
-		this.fourPos.put("top", new Integer[] { posX + width / 2, posY });
-		this.fourPos.put("left", new Integer[] { posX, posY + height / 2 });
-		this.fourPos.put("bottom", new Integer[] { posX + width / 2, posY + height });
-		this.fourPos.put("right", new Integer[] { posX + width, posY + height / 2 });
+		this.fourPart.put("top", new Integer[] { posX + width / 2, posY });
+		this.fourPart.put("left", new Integer[] { posX, posY + height / 2 });
+		this.fourPart.put("bottom", new Integer[] { posX + width / 2, posY + height });
+		this.fourPart.put("right", new Integer[] { posX + width, posY + height / 2 });
 	}
 
 	@Override
@@ -54,20 +55,23 @@ public class BasicObject extends AllShape {
 			graphics2d.drawLine(posX, posY + height * 2 / 3, posX + width, posY + height * 2 / 3);
 		} else if (type.equals("use_case")) {
 			graphics2d.setStroke(new BasicStroke(3));
-			graphics2d.drawOval(posX, posY, width, height - 20);
+			graphics2d.drawOval(posX, posY, width, height);
 		}
 
 		if (seleced) {
 			graphics2d.setStroke(new BasicStroke(10));
 			// top
-			graphics2d.drawLine((posX + width) / 2 - origin, posY, (posX + width) / 2 + origin, posY);
+			graphics2d.drawLine(fourPart.get("top")[0], fourPart.get("top")[1], fourPart.get("top")[0],
+					fourPart.get("top")[1]);
 			// left
-			graphics2d.drawLine(posX, (posY + height) / 2 - origin, posX, (posY + height) / 2 + origin);
+			graphics2d.drawLine(fourPart.get("left")[0], fourPart.get("left")[1], fourPart.get("left")[0],
+					fourPart.get("left")[1]);
 			// bottom
-			graphics2d.drawLine((posX + width) / 2 - origin, posY + height, (posX + width) / 2 + origin, posY + height);
+			graphics2d.drawLine(fourPart.get("bottom")[0], fourPart.get("bottom")[1], fourPart.get("bottom")[0],
+					fourPart.get("bottom")[1]);
 			// right
-			graphics2d.drawLine(posX + width, (posY + height) / 2 - origin, posX + width + origin,
-					(posY + height) / 2 + origin);
+			graphics2d.drawLine(fourPart.get("right")[0], fourPart.get("right")[1], fourPart.get("right")[0],
+					fourPart.get("right")[1]);
 		}
 	}
 //		};
@@ -76,6 +80,31 @@ public class BasicObject extends AllShape {
 //		panel.setLayout(null);
 //		panel.setVisible(true);
 //	}
+
+	public Integer[] getClosedPart(int mouseX, int mouseY) {
+		Integer[] closedPart = null;
+		double distance = 10000.0;
+
+		for (String i : fourPart.keySet()) {
+			double tmpDis = Math.sqrt((mouseX - fourPart.get(i)[0]) * (mouseX - fourPart.get(i)[0])
+					+ (mouseY - fourPart.get(i)[1]) * (mouseY - fourPart.get(i)[1]));
+			// 新距離比較近的話
+			if (distance > tmpDis) {
+				distance = tmpDis;
+				closedPart = fourPart.get(i);
+			}
+		}
+		return closedPart;
+	}
+
+	protected void updatePositionAndFourPart(int mouseX, int mouseY) {
+		this.posX = mouseX;
+		this.posY = mouseY;
+		this.fourPart.put("top", new Integer[] { posX + width / 2, posY });
+		this.fourPart.put("left", new Integer[] { posX, posY + height / 2 });
+		this.fourPart.put("bottom", new Integer[] { posX + width / 2, posY + height });
+		this.fourPart.put("right", new Integer[] { posX + width, posY + height / 2 });
+	}
 
 	public int getWidth() {
 		return width;
@@ -117,8 +146,16 @@ public class BasicObject extends AllShape {
 		this.depth = depth;
 	}
 
-	public HashMap<String, Integer[]> getFourPos() {
-		return fourPos;
+	public boolean getSelected() {
+		return this.seleced;
+	}
+
+	public void setSelected(boolean flag) {
+		this.seleced = flag;
+	}
+
+	public HashMap<String, Integer[]> getFourPart() {
+		return fourPart;
 	}
 
 }

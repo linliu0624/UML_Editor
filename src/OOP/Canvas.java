@@ -23,6 +23,10 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	private int depth = 0;
 	private BasicObject startObject = null;
 	private BasicObject endObject = null;
+	private Integer[] startPart;
+	private Integer[] endPart;
+	private int selectedObjectIndex = -1;
+	private boolean draggAble = false;
 
 	public Canvas(JFrame mainFrame, ToolManager toolManager, int[] bgRGBColor, int posX, int posY, int width,
 			int height) {
@@ -53,72 +57,82 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		BasicObject basicObject = null;
+		if (toolManager.getCurrentMode() == "select") {
+			if (getTopObjectIndex(e) == -1) {
+				for (BasicObject obj : objectList) {
+					obj.setSelected(false);
+				}
+				selectedObjectIndex = -1;
+			} else {
+				for (BasicObject obj : objectList) {
+					obj.setSelected(false);
+				}
+				objectList.get(getTopObjectIndex(e)).setSelected(true);
+				System.out.println("Depth: " + objectList.get(getTopObjectIndex(e)).GetDepth());
+				selectedObjectIndex = getTopObjectIndex(e);
+			}
 
-		if (toolManager.getCurrentMode() == "class" || toolManager.getCurrentMode() == "use_case") {
+		} else if (toolManager.getCurrentMode() == "class" || toolManager.getCurrentMode() == "use_case") {
 			basicObject = new BasicObject(toolManager.getCurrentMode(), this, depth, e.getX(), e.getY(), 100, 100);
+			objectList.add(basicObject);
 			depth++;
 		}
-//		basicObject.drawOnCanvas();
-		objectList.add(basicObject);
 		mainFrame.revalidate();
 		mainFrame.repaint();
+//		basicObject.drawOnCanvas();
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		int minDepth = 100;
-		if (toolManager.getCurrentMode() == "association_line") {
-			for (BasicObject object : objectList) {
-				// BUG if draw line, the line well be basicObject
-				if (object.getPosX() < e.getX() && object.getPosX() + object.getWidth() > e.getX()
-						&& object.getPosY() < e.getY() && object.getPosY() + object.getHeight() > e.getY()) {
-					if (object.GetDepth() < minDepth) {
-						startObject = object;
-						minDepth = object.GetDepth();
-					}
-				}
+		if (toolManager.getCurrentMode().equals("select")) {
 
+			if (getMouseOnSelectedObjectIndex(e) != -1) {
+				draggAble = true;
+			} else {
+				draggAble = false;
 			}
+		} else if (toolManager.getCurrentMode().equals("association_line")) {
+			startObject = getTopObjectIndex(e) == -1 ? null : objectList.get(getTopObjectIndex(e));
+			if (startObject != null)
+				startPart = startObject.getClosedPart(e.getX(), e.getY());
 		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		int minDepth = 100;
-		if (toolManager.getCurrentMode() == "association_line") {
-			for (BasicObject object : objectList) {
-				if (object.getPosX() < e.getX() && object.getPosX() + object.getWidth() > e.getX()
-						&& object.getPosY() < e.getY() && object.getPosY() + object.getHeight() > e.getY()) {
-					if (object.GetDepth() < minDepth) {
-						endObject = object;
-						minDepth = object.GetDepth();
-					}
-				}
-			}
-		}
 
-		if (endObject != null && startObject != null) {
-			// draw line
-//			objectList.add(new BasicLine(toolManager.getCurrentMode(), this, depth, startObject.getPosX(),
-//					endObject.getPosX(), endObject.getPosX(), endObject.getPosY()));
-			depth++;
-			mainFrame.repaint();
+		if (toolManager.getCurrentMode().equals("association_line")) {
+			endObject = getTopObjectIndex(e) == -1 ? null : objectList.get(getTopObjectIndex(e));
+			if (endObject != null && startObject != null) {
+				// draw line
+				endPart = endObject.getClosedPart(e.getX(), e.getY());
+				basicLineList.add(new BasicLine(toolManager.getCurrentMode(), this, depth, startPart[0], startPart[1],
+						endPart[0], endPart[1]));
+				depth++;
+				mainFrame.repaint();
+			} else {
+				System.out.println("release start: " + startObject);
+				System.out.println("release end: " + endObject);
+			}
 		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-
+		if (toolManager.getCurrentMode().equals("select")) {
+			if (draggAble) {
+				objectList.get(selectedObjectIndex).updatePositionAndFourPart(e.getX(), e.getY());
+				mainFrame.repaint();
+			}
+		}
 	}
 
 	@Override
@@ -126,19 +140,37 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 
 	}
 
-	public BasicObject getTopObject(MouseEvent e) {
+	public int getTopObjectIndex(MouseEvent e) {
 		int minDepth = 100;
-		BasicObject topObejct = null;
+		int index = 0;
+		int topObjectIndex = -1;
+//		BasicObject topObejct = null;
 		for (BasicObject object : objectList) {
 			if (object.getPosX() < e.getX() && object.getPosX() + object.getWidth() > e.getX()
 					&& object.getPosY() < e.getY() && object.getPosY() + object.getHeight() > e.getY()) {
 				if (object.GetDepth() < minDepth) {
-					topObejct = object;
+					topObjectIndex = index;
+//					topObejct = object;
 					minDepth = object.GetDepth();
 				}
 			}
+			index++;
 		}
-		return topObejct;
+		return topObjectIndex;
+	}
+
+	public int getMouseOnSelectedObjectIndex(MouseEvent e) {
+		int index = 0;
+		for (BasicObject object : objectList) {
+			if (object.getSelected()) {
+				if (object.getPosX() < e.getX() && object.getPosX() + object.getWidth() > e.getX()
+						&& object.getPosY() < e.getY() && object.getPosY() + object.getHeight() > e.getY()) {
+					return index;
+				}
+			}
+			index++;
+		}
+		return -1;
 	}
 
 }
