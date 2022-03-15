@@ -1,6 +1,8 @@
 package OOP;
 
 import javax.swing.JPanel;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 public abstract class AllShape {
     protected int depth;
@@ -13,13 +15,13 @@ public abstract class AllShape {
         this.depth = depth;
     }
 
-    protected abstract void paintShape();
+    protected abstract void paintShape(Graphics graphics);
 
-    protected void drawOnCanvas() {
-        paintShape();
-        canvas.add(panel, Integer.valueOf(depth));
-        canvas.revalidate();
-        canvas.repaint();
+    protected void drawOnCanvas(Graphics graphics) {
+        paintShape(graphics);
+//        canvas.add(panel, Integer.valueOf(depth));
+//        canvas.revalidate();
+//        canvas.repaint();
     }
 
     public JPanel getPanel() {
