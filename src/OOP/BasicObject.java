@@ -1,5 +1,7 @@
 package OOP;
 
+import java.util.HashMap;
+
 import javax.swing.JPanel;
 
 import java.awt.Graphics;
@@ -17,6 +19,7 @@ public class BasicObject extends AllShape {
 	private int posX, posY;
 	private int width, height;
 	private int origin = 5;
+	private HashMap<String, Integer[]> fourPos = new HashMap<String, Integer[]>();
 
 	public BasicObject(String type, Canvas canvas, int depth, int posX, int posY, int width, int height) {
 		super(canvas, depth);
@@ -27,6 +30,10 @@ public class BasicObject extends AllShape {
 		this.width = width;
 		this.height = height;
 		this.type = type;
+		this.fourPos.put("top", new Integer[] { posX + width / 2, posY });
+		this.fourPos.put("left", new Integer[] { posX, posY + height / 2 });
+		this.fourPos.put("bottom", new Integer[] { posX + width / 2, posY + height });
+		this.fourPos.put("right", new Integer[] { posX + width, posY + height / 2 });
 	}
 
 	@Override
@@ -37,7 +44,7 @@ public class BasicObject extends AllShape {
 //			@Override
 //			public void paint(Graphics graphics) {
 //				super.paint(graphics);
-		
+
 		Graphics2D graphics2d = (Graphics2D) graphics;
 		if (type.equals("class")) {
 			graphics2d.setStroke(new BasicStroke(3));
@@ -46,7 +53,8 @@ public class BasicObject extends AllShape {
 			graphics2d.drawLine(posX, posY + height / 3, posX + width, posY + height / 3);
 			graphics2d.drawLine(posX, posY + height * 2 / 3, posX + width, posY + height * 2 / 3);
 		} else if (type.equals("use_case")) {
-			graphics2d.drawOval(posX, posY, width, height);
+			graphics2d.setStroke(new BasicStroke(3));
+			graphics2d.drawOval(posX, posY, width, height - 20);
 		}
 
 		if (seleced) {
@@ -107,6 +115,10 @@ public class BasicObject extends AllShape {
 
 	public void setDepth(int depth) {
 		this.depth = depth;
+	}
+
+	public HashMap<String, Integer[]> getFourPos() {
+		return fourPos;
 	}
 
 }

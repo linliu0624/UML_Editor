@@ -15,10 +15,9 @@ import java.awt.Graphics2D;
 
 public class Canvas extends JLayeredPane implements MouseListener, MouseMotionListener {
 	// private ToolManager toolManager;
-	private ArrayList<AllShape> objectList = new ArrayList<AllShape>();
-//	private ArrayList<BasicObject> basicObjectList = new ArrayList<BasicObject>();
-//	private ArrayList<BasicLine> basicLineList = new ArrayList<BasicLine>();
-	
+	private ArrayList<BasicObject> objectList = new ArrayList<BasicObject>();
+	private ArrayList<BasicLine> basicLineList = new ArrayList<BasicLine>();
+
 	private JFrame mainFrame;
 	private ToolManager toolManager;
 	private int depth = 0;
@@ -43,14 +42,17 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		System.out.println(objectList.size());
-		for (AllShape object : objectList) {
+		for (BasicObject object : objectList) {
 			object.drawOnCanvas(g);
+		}
+		for (BasicLine line : basicLineList) {
+			line.drawOnCanvas(g);
 		}
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		AllShape basicObject = null;
+		BasicObject basicObject = null;
 
 		if (toolManager.getCurrentMode() == "class" || toolManager.getCurrentMode() == "use_case") {
 			basicObject = new BasicObject(toolManager.getCurrentMode(), this, depth, e.getX(), e.getY(), 100, 100);
@@ -76,16 +78,13 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	public void mousePressed(MouseEvent e) {
 		int minDepth = 100;
 		if (toolManager.getCurrentMode() == "association_line") {
-			for (AllShape object : objectList) {
+			for (BasicObject object : objectList) {
 				// BUG if draw line, the line well be basicObject
-				if(!object.getClass().equals("BasicObject")) { continue; }
-				else if (((BasicObject) object).getPosX() < e.getX()
-						&& ((BasicObject) object).getPosX() + ((BasicObject) object).getWidth() > e.getX()
-						&& ((BasicObject) object).getPosY() < e.getY()
-						&& ((BasicObject) object).getPosY() + ((BasicObject) object).getHeight() > e.getY()) {
-					if (((BasicObject) object).GetDepth() < minDepth) {
-						startObject = ((BasicObject) object);
-						minDepth = ((BasicObject) object).GetDepth();
+				if (object.getPosX() < e.getX() && object.getPosX() + object.getWidth() > e.getX()
+						&& object.getPosY() < e.getY() && object.getPosY() + object.getHeight() > e.getY()) {
+					if (object.GetDepth() < minDepth) {
+						startObject = object;
+						minDepth = object.GetDepth();
 					}
 				}
 
@@ -97,15 +96,12 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	public void mouseReleased(MouseEvent e) {
 		int minDepth = 100;
 		if (toolManager.getCurrentMode() == "association_line") {
-			for (AllShape object : objectList) {
-				if(!object.getClass().equals("BasicObject")) { continue; }
-				else if (((BasicObject) object).getPosX() < e.getX()
-						&& ((BasicObject) object).getPosX() + ((BasicObject) object).getWidth() > e.getX()
-						&& ((BasicObject) object).getPosY() < e.getY()
-						&& ((BasicObject) object).getPosY() + ((BasicObject) object).getHeight() > e.getY()) {
-					if (((BasicObject) object).GetDepth() < minDepth) {
-						endObject = ((BasicObject) object);
-						minDepth = ((BasicObject) object).GetDepth();
+			for (BasicObject object : objectList) {
+				if (object.getPosX() < e.getX() && object.getPosX() + object.getWidth() > e.getX()
+						&& object.getPosY() < e.getY() && object.getPosY() + object.getHeight() > e.getY()) {
+					if (object.GetDepth() < minDepth) {
+						endObject = object;
+						minDepth = object.GetDepth();
 					}
 				}
 			}
@@ -113,8 +109,8 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 
 		if (endObject != null && startObject != null) {
 			// draw line
-			objectList.add(new BasicLine(toolManager.getCurrentMode(), this, depth, startObject.getPosX(),
-					endObject.getPosX(), endObject.getPosX(), endObject.getPosY()));
+//			objectList.add(new BasicLine(toolManager.getCurrentMode(), this, depth, startObject.getPosX(),
+//					endObject.getPosX(), endObject.getPosX(), endObject.getPosY()));
 			depth++;
 			mainFrame.repaint();
 		}
@@ -128,6 +124,21 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	@Override
 	public void mouseMoved(MouseEvent e) {
 
+	}
+
+	public BasicObject getTopObject(MouseEvent e) {
+		int minDepth = 100;
+		BasicObject topObejct = null;
+		for (BasicObject object : objectList) {
+			if (object.getPosX() < e.getX() && object.getPosX() + object.getWidth() > e.getX()
+					&& object.getPosY() < e.getY() && object.getPosY() + object.getHeight() > e.getY()) {
+				if (object.GetDepth() < minDepth) {
+					topObejct = object;
+					minDepth = object.GetDepth();
+				}
+			}
+		}
+		return topObejct;
 	}
 
 }
