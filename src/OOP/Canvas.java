@@ -23,8 +23,8 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	private int depth = 0;
 	private BasicObject startObject = null;
 	private BasicObject endObject = null;
-	private Integer[] startPart;
-	private Integer[] endPart;
+	private String startPart;
+	private String endPart;
 	private int selectedObjectIndex = -1;
 	private boolean draggAble = false;
 
@@ -99,7 +99,9 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 			} else {
 				draggAble = false;
 			}
-		} else if (toolManager.getCurrentMode().equals("association_line")) {
+		} else if (toolManager.getCurrentMode().equals("association_line")
+				|| toolManager.getCurrentMode().equals("generalization_line")
+				|| toolManager.getCurrentMode().equals("composition_line")) {
 			startObject = getTopObjectIndex(e) == -1 ? null : objectList.get(getTopObjectIndex(e));
 			if (startObject != null)
 				startPart = startObject.getClosedPart(e.getX(), e.getY());
@@ -109,13 +111,20 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	@Override
 	public void mouseReleased(MouseEvent e) {
 
-		if (toolManager.getCurrentMode().equals("association_line")) {
+		if (toolManager.getCurrentMode().equals("association_line")
+				|| toolManager.getCurrentMode().equals("generalization_line")
+				|| toolManager.getCurrentMode().equals("composition_line")) {
 			endObject = getTopObjectIndex(e) == -1 ? null : objectList.get(getTopObjectIndex(e));
-			if (endObject != null && startObject != null) {
+			if (endObject != null && startObject != null && startObject != endObject) {
 				// draw line
 				endPart = endObject.getClosedPart(e.getX(), e.getY());
-				basicLineList.add(new BasicLine(toolManager.getCurrentMode(), this, depth, startPart[0], startPart[1],
-						endPart[0], endPart[1]));
+				if (toolManager.getCurrentMode().equals("association_line")) {
+					basicLineList.add(new AssociationLine(this, depth, startObject, endObject, startPart, endPart));
+				} else if (toolManager.getCurrentMode().equals("generalization_line")) {
+					basicLineList.add(new GeneralizationLine(this, depth, startObject, endObject, startPart, endPart));
+				}else if(toolManager.getCurrentMode().equals("composition_line")) {
+					basicLineList.add(new CompositionLine(this, depth, startObject, endObject, startPart, endPart));
+				}
 				depth++;
 				mainFrame.repaint();
 			} else {

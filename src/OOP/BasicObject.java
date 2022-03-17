@@ -81,9 +81,9 @@ public class BasicObject extends AllShape {
 //		panel.setVisible(true);
 //	}
 
-	public Integer[] getClosedPart(int mouseX, int mouseY) {
-		Integer[] closedPart = null;
-		double distance = 10000.0;
+	public String getClosedPart(int mouseX, int mouseY) {
+		String closedPart = null;
+		double distance = Double.MAX_VALUE;
 
 		for (String i : fourPart.keySet()) {
 			double tmpDis = Math.sqrt((mouseX - fourPart.get(i)[0]) * (mouseX - fourPart.get(i)[0])
@@ -91,7 +91,7 @@ public class BasicObject extends AllShape {
 			// 新距離比較近的話
 			if (distance > tmpDis) {
 				distance = tmpDis;
-				closedPart = fourPart.get(i);
+				closedPart = i;
 			}
 		}
 		return closedPart;
