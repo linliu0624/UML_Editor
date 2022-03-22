@@ -187,14 +187,13 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	}
 
 	public int getTopObjectIndex(MouseEvent e) {
-		int minDepth = 100;
+		int minDepth = Integer.MIN_VALUE; //100
 		int index = 0;
 		int topObjectIndex = -1;
 //		BasicObject topObejct = null;
 		for (BasicObject object : objectList) {
-			if (object.getPosX() < e.getX() && object.getPosX() + object.getWidth() > e.getX()
-					&& object.getPosY() < e.getY() && object.getPosY() + object.getHeight() > e.getY()) {
-				if (object.GetDepth() < minDepth) {
+			if(object.clickInObject(e.getX(), e.getY())) {
+				if (object.GetDepth() > minDepth) {
 					topObjectIndex = index;
 //					topObejct = object;
 					minDepth = object.GetDepth();

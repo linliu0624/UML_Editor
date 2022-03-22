@@ -30,7 +30,7 @@ public class BasicObject extends AllShape {
 		this.width = width;
 		this.height = height;
 		if (type.equals("use_case")) {
-			this.setHeight(this.height-15);
+			this.setHeight(this.height - 15);
 		}
 		this.type = type;
 		this.fourPart.put("top", new Integer[] { this.posX + this.width / 2, this.posY });
@@ -97,6 +97,14 @@ public class BasicObject extends AllShape {
 			}
 		}
 		return closedPart;
+	}
+
+	public boolean clickInObject(int x, int y) {
+		if (getPosX() < x && getPosX() + getWidth() > x && getPosY() < y && getPosY() + getHeight() > y) {
+			return true;
+		}
+		return false;
+
 	}
 
 	protected void updatePosition(int mouseX, int mouseY) {
