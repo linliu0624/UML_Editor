@@ -19,7 +19,6 @@ public class BasicObject extends AllShape {
 	private int depth;
 	private int posX, posY;
 	private int width, height;
-	private int origin = 5;
 	private HashMap<String, Integer[]> fourPart = new HashMap<String, Integer[]>();
 
 	public BasicObject(String type, Canvas canvas, int depth, int posX, int posY, int width, int height) {
@@ -34,10 +33,10 @@ public class BasicObject extends AllShape {
 			this.height -= 15;
 		}
 		this.type = type;
-		this.fourPart.put("top", new Integer[] { posX + width / 2, posY });
-		this.fourPart.put("left", new Integer[] { posX, posY + height / 2 });
-		this.fourPart.put("bottom", new Integer[] { posX + width / 2, posY + height });
-		this.fourPart.put("right", new Integer[] { posX + width, posY + height / 2 });
+		this.fourPart.put("top", new Integer[] { this.posX + this.width / 2, this.posY });
+		this.fourPart.put("left", new Integer[] { this.posX, this.posY + this.height / 2 });
+		this.fourPart.put("bottom", new Integer[] { this.posX + this.width / 2, this.posY + this.height });
+		this.fourPart.put("right", new Integer[] { this.posX + this.width, this.posY + this.height / 2 });
 	}
 
 	@Override
@@ -100,7 +99,7 @@ public class BasicObject extends AllShape {
 		return closedPart;
 	}
 
-	protected void updatePositionAndFourPart(int mouseX, int mouseY) {
+	protected void updatePosition(int mouseX, int mouseY) {
 		this.posX = mouseX;
 		this.posY = mouseY;
 		this.fourPart.put("top", new Integer[] { posX + width / 2, posY });
