@@ -21,12 +21,13 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	private JFrame mainFrame;
 	private ToolManager toolManager;
 	private int depth = 0;
+	private int layer = 0;
+	private int guoupeLayer = 0;
 	private BasicObject startObject = null;
 	private BasicObject endObject = null;
 	private String startPart;
 	private String endPart;
 	private int selectedObjectIndex = -1;
-	private int[] selectedObjectsIndex;
 	private boolean draggAble = false;
 	private int[] mouseEnterPos;
 	private int[] mouseExitPos;
@@ -59,6 +60,8 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		System.out.println(e.getX());
+		System.out.println(e.getY());
 		BasicObject basicObject = null;
 		if (toolManager.getCurrentMode() == "select") {
 			if (getTopObjectIndex(e) == -1) {
@@ -148,7 +151,7 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	public void mouseDragged(MouseEvent e) {
 		if (toolManager.getCurrentMode().equals("select")) {
 			if (draggAble) {
-				objectList.get(selectedObjectIndex).updatePositionAndFourPart(e.getX(), e.getY());
+				objectList.get(selectedObjectIndex).updatePosition(e.getX(), e.getY());
 				mainFrame.repaint();
 			}
 		}
@@ -156,6 +159,30 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
+
+	}
+
+	public void GroupObjects() {
+		CompositeObject group = new CompositeObject("", this, depth, layer, Integer.MAX_VALUE, Integer.MAX_VALUE,
+				Integer.MIN_VALUE, Integer.MIN_VALUE);
+		depth++;
+		layer++;
+
+		for (BasicObject obj : objectList) {
+			if (obj.getSelected()) {
+				group.addObject(obj);
+			}
+		}
+		group.updatePosition();
+		objectList.add(group);
+		System.out.println("is group?");
+	}
+
+	public void UnGroupObjects() {
+
+	}
+
+	public void changeObjName(String name) {
 
 	}
 
@@ -183,12 +210,12 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 			int[] temp = mouseEnterPos;
 			mouseEnterPos = mouseExitPos;
 			mouseExitPos = temp;
-		}else if(mouseEnterPos[0] > mouseExitPos[0] && mouseEnterPos[1] < mouseExitPos[1]) {
+		} else if (mouseEnterPos[0] > mouseExitPos[0] && mouseEnterPos[1] < mouseExitPos[1]) {
 			int enterX = mouseEnterPos[0];
 			int exitX = mouseExitPos[0];
 			mouseEnterPos[0] = exitX;
 			mouseExitPos[0] = enterX;
-		}else if(mouseEnterPos[1] > mouseExitPos[1] && mouseEnterPos[0] < mouseExitPos[0]) {
+		} else if (mouseEnterPos[1] > mouseExitPos[1] && mouseEnterPos[0] < mouseExitPos[0]) {
 			int enterY = mouseEnterPos[1];
 			int exitY = mouseExitPos[1];
 			mouseEnterPos[1] = exitY;
@@ -205,7 +232,6 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 					i++;
 				} else {
 					object.setSelected(false);
-					System.out.println("sad");
 				}
 			}
 		}
