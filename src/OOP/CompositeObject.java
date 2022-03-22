@@ -19,9 +19,7 @@ public class CompositeObject extends BasicObject {
 
 	@Override
 	protected void paintShape(Graphics graphics) {
-//		for(BasicObject obj: objectGroupe) {
-//			obj.paintShape(graphics);
-//		}
+		graphics.drawRect(super.getPosX(), super.getPosY(), super.getWidth(), super.getHeight());
 	}
 
 	public void updatePosition() {
@@ -30,29 +28,26 @@ public class CompositeObject extends BasicObject {
 
 		for (BasicObject object : objectGroup) {
 			if (object.getPosX() < super.getPosX()) {
-//				posX = object.getPosX();
 				super.setPosX(object.getPosX());				
 			}
 			if (object.getPosY() < super.getPosY()) {
-//				posY = object.getPosY();
 				super.setPosY(object.getPosY());
 			}
 
 			if (object.getPosX() + object.getWidth() > maxX) {
 				maxX = object.getPosX() + object.getWidth();
-//				width = maxX - posX;
-				super.setWidth(maxX - super.getPosX());
 			}
 			if (object.getPosY() + object.getHeight() > maxY) {
 				maxY = object.getPosY() + object.getHeight();
-//				height = maxY - posY;
-				super.setHeight(maxY - super.getPosY());
 			}
 		}
-		System.out.println(super.getPosX());
-		System.out.println(super.getPosY());
-		System.out.println(super.getWidth());
-		System.out.println(super.getHeight());
+		super.setWidth(maxX - super.getPosX());
+		super.setHeight(maxY - super.getPosY());
+		
+//		System.out.println(super.getPosX());
+//		System.out.println(super.getPosY());
+//		System.out.println(super.getWidth());
+//		System.out.println(super.getHeight());
 		
 	}
 
