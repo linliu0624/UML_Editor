@@ -26,7 +26,10 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	private String startPart;
 	private String endPart;
 	private int selectedObjectIndex = -1;
+	private int[] selectedObjectsIndex;
 	private boolean draggAble = false;
+	private int[] mouseEnterPos;
+	private int[] mouseExitPos;
 
 	public Canvas(JFrame mainFrame, ToolManager toolManager, int[] bgRGBColor, int posX, int posY, int width,
 			int height) {
@@ -84,20 +87,23 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
+
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
+
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		mouseEnterPos = new int[] { e.getX(), e.getY() };
 		if (toolManager.getCurrentMode().equals("select")) {
-
 			if (getMouseOnSelectedObjectIndex(e) != -1) {
 				draggAble = true;
 			} else {
 				draggAble = false;
+
 			}
 		} else if (toolManager.getCurrentMode().equals("association_line")
 				|| toolManager.getCurrentMode().equals("generalization_line")
@@ -110,8 +116,12 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		mouseExitPos = new int[] { e.getX(), e.getY() };
 
-		if (toolManager.getCurrentMode().equals("association_line")
+		if (toolManager.getCurrentMode().equals("select")) {
+			SelectManyObjects(e);
+			mainFrame.repaint();
+		} else if (toolManager.getCurrentMode().equals("association_line")
 				|| toolManager.getCurrentMode().equals("generalization_line")
 				|| toolManager.getCurrentMode().equals("composition_line")) {
 			endObject = getTopObjectIndex(e) == -1 ? null : objectList.get(getTopObjectIndex(e));
@@ -122,7 +132,7 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 					basicLineList.add(new AssociationLine(this, depth, startObject, endObject, startPart, endPart));
 				} else if (toolManager.getCurrentMode().equals("generalization_line")) {
 					basicLineList.add(new GeneralizationLine(this, depth, startObject, endObject, startPart, endPart));
-				}else if(toolManager.getCurrentMode().equals("composition_line")) {
+				} else if (toolManager.getCurrentMode().equals("composition_line")) {
 					basicLineList.add(new CompositionLine(this, depth, startObject, endObject, startPart, endPart));
 				}
 				depth++;
@@ -166,6 +176,39 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 			index++;
 		}
 		return topObjectIndex;
+	}
+
+	public void SelectManyObjects(MouseEvent e) {
+		if (mouseEnterPos[0] > mouseExitPos[0] && mouseEnterPos[1] > mouseExitPos[1]) {
+			int[] temp = mouseEnterPos;
+			mouseEnterPos = mouseExitPos;
+			mouseExitPos = temp;
+		}else if(mouseEnterPos[0] > mouseExitPos[0] && mouseEnterPos[1] < mouseExitPos[1]) {
+			int enterX = mouseEnterPos[0];
+			int exitX = mouseExitPos[0];
+			mouseEnterPos[0] = exitX;
+			mouseExitPos[0] = enterX;
+		}else if(mouseEnterPos[1] > mouseExitPos[1] && mouseEnterPos[0] < mouseExitPos[0]) {
+			int enterY = mouseEnterPos[1];
+			int exitY = mouseExitPos[1];
+			mouseEnterPos[1] = exitY;
+			mouseExitPos[1] = enterY;
+		}
+		int i = 0;
+		if (!draggAble) {
+			for (BasicObject object : objectList) {
+				if (object.getPosX() > mouseEnterPos[0] && object.getPosX() + object.getWidth() < mouseExitPos[0]
+						&& object.getPosY() > mouseEnterPos[1]
+						&& object.getPosY() + object.getHeight() < mouseExitPos[1]) {
+					object.setSelected(true);
+					System.out.println(i);
+					i++;
+				} else {
+					object.setSelected(false);
+					System.out.println("sad");
+				}
+			}
+		}
 	}
 
 	public int getMouseOnSelectedObjectIndex(MouseEvent e) {
