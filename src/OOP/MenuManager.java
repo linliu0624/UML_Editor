@@ -1,37 +1,121 @@
 package OOP;
 
+import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.BoxLayout;
 
-public class MenuManager {
-	private String[] buttonsName = new String[] { "File", "Groupe", "Ungroupe" };
+public class MenuManager extends JMenuBar {
+	private Canvas canvas;
+	private String[] buttonsName = new String[] { "File", "Edit", "Group", "Ungroup", "Change object name" };
 	private ArrayList<JButton> buttons = new ArrayList<JButton>();
 	private int buttonWidth = 100;
 	private int buttonheight = 20;
 
-	public MenuManager() {
-		for (int i = 0; i < buttonsName.length; i++) {
+	public MenuManager(Canvas canvas) {
+		this.canvas = canvas;
 
-			JButton button = new JButton(buttonsName[i]);
-			button.setName(buttonsName[i]);
-			button.setBounds(i * buttonWidth, 0, buttonWidth, buttonheight);
-			button.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-//					onClick(e);
-				}
+		JMenu menu;
+		JMenuItem menuItem;
 
-			});
-			buttons.add(button);
-			// toolBox.add(button);
-			// toolBox.add(Box.createVerticalStrut(5));
+		/* --- File menu --- */
+		menu = new JMenu(buttonsName[0]);
+		add(menu);
+
+		/* --- Edit menu --- */
+		menu = new JMenu(buttonsName[1]);
+		add(menu);
+
+		menuItem = new JMenuItem(buttonsName[4]);
+		menu.add(menuItem);
+		menuItem.addActionListener(new ChangeNameListener());
+
+		menuItem = new JMenuItem(buttonsName[2]);
+		menu.add(menuItem);
+		menuItem.addActionListener(new GroupObjectListener());
+
+		menuItem = new JMenuItem(buttonsName[3]);
+		menu.add(menuItem);
+		menuItem.addActionListener(new UngroupObjectListener());
+
+		this.setBounds(0, 0, 1280, 20);
+		this.setBackground(Color.gray);
+	}
+
+	private void changeNameForm() {
+		JFrame inputTextFrame = new JFrame("Change Object Name");
+		inputTextFrame.setSize(400, 100);
+		inputTextFrame.getContentPane().setLayout(new GridLayout(0, 1));
+
+		JPanel panel = null;
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+		JTextField Text = new JTextField("Object Name");
+		panel.add(Text);
+		inputTextFrame.getContentPane().add(panel);
+
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+		JButton confirm = new JButton("OK");
+		panel.add(confirm);
+
+		JButton cancel = new JButton("Cancel");
+		panel.add(cancel);
+
+		inputTextFrame.getContentPane().add(panel);
+
+		inputTextFrame.setLocationRelativeTo(null);
+		inputTextFrame.setVisible(true);
+
+		confirm.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				canvas.changeObjName(Text.getText());
+				inputTextFrame.dispose();
+
+			}
+		});
+
+		cancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				inputTextFrame.dispose();
+			}
+		});
+
+	}
+
+	class UngroupObjectListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			canvas.UnGroupObjects();
 		}
 	}
-	
-    protected ArrayList<JButton> getAllButton() {
-        return buttons;
-    }
+
+	class GroupObjectListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			// canvas.addGroup();
+			canvas.GroupObjects();
+		}
+	}
+
+	class ChangeNameListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			changeNameForm();
+		}
+	}
+
+	protected ArrayList<JButton> getAllButton() {
+		return buttons;
+	}
+
 }
