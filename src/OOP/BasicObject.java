@@ -30,7 +30,7 @@ public class BasicObject extends AllShape {
 		this.width = width;
 		this.height = height;
 		if (type.equals("use_case")) {
-			this.height -= 15;
+			this.setHeight(this.height-15);
 		}
 		this.type = type;
 		this.fourPart.put("top", new Integer[] { this.posX + this.width / 2, this.posY });
