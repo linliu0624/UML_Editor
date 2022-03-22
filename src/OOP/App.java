@@ -16,11 +16,14 @@ public class App {
 
         ToolManager toolManager = new ToolManager(buttonIconFiles, 0, 20, 75);
         Canvas mainCanvas = new Canvas(mainFrame, toolManager, canvasColor, 80, 20, 1180, 650);
-
+        MenuManager menuManager = new MenuManager();
+        
         for (JButton button : toolManager.getAllButton()) {
             mainFrame.add(button);
         }
-
+        for (JButton button : menuManager.getAllButton()) {
+        	mainFrame.add(button);
+        }
         mainFrame.add(mainCanvas);
         mainFrame.setVisible(true);
     }
