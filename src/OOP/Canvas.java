@@ -21,8 +21,6 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	private JFrame mainFrame;
 	private ToolManager toolManager;
 	private int depth = 0;
-	private int layer = 0;
-	private int guoupeLayer = 0;
 	private BasicObject startObject = null;
 	private BasicObject endObject = null;
 	private String startPart;
@@ -74,7 +72,7 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 					obj.setSelected(false);
 				}
 				objectList.get(getTopObjectIndex(e)).setSelected(true);
-				System.out.println("Depth: " + objectList.get(getTopObjectIndex(e)).GetDepth());
+				System.out.println("Depth: " + objectList.get(getTopObjectIndex(e)).getDepth());
 				selectedObjectIndex = getTopObjectIndex(e);
 			}
 
@@ -128,7 +126,8 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 				|| toolManager.getCurrentMode().equals("generalization_line")
 				|| toolManager.getCurrentMode().equals("composition_line")) {
 			endObject = getTopObjectIndex(e) == -1 ? null : objectList.get(getTopObjectIndex(e));
-			if (endObject != null && startObject != null && startObject != endObject) {
+			if (endObject != null && startObject != null && startObject != endObject
+					&& startObject.getIsGroup() == false && endObject.getIsGroup() == false) {
 				// draw line
 				endPart = endObject.getClosedPart(e.getX(), e.getY());
 				if (toolManager.getCurrentMode().equals("association_line")) {
@@ -163,23 +162,29 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	}
 
 	public void GroupObjects() {
-		CompositeObject group = new CompositeObject("", this, depth, layer, Integer.MAX_VALUE, Integer.MAX_VALUE,
+		CompositeObject group = new CompositeObject("", this, depth, Integer.MAX_VALUE, Integer.MAX_VALUE,
 				Integer.MIN_VALUE, Integer.MIN_VALUE);
 		depth++;
-		layer++;
+
+		boolean hasSelected = false;
 
 		for (BasicObject obj : objectList) {
 			if (obj.getSelected()) {
 				group.addObject(obj);
+				hasSelected = true;
 			}
 		}
-		group.updatePosition();
-		objectList.add(group);
-		System.out.println("is group?");
+		if (hasSelected) {
+			group.updateBound();
+			objectList.add(group);
+		}
 	}
 
 	public void UnGroupObjects() {
-
+		int index = getIndexOfTheBiggestDepth(objectList);
+//		((CompositeObject) objectList.get(index)).disBindingAllMember();
+//		((CompositeObject) objectList.get(index)).updateBound();
+		objectList.remove(objectList.get(index));
 	}
 
 	public void changeObjName(String name) {
@@ -187,16 +192,16 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	}
 
 	public int getTopObjectIndex(MouseEvent e) {
-		int minDepth = Integer.MIN_VALUE; //100
+		int minDepth = Integer.MIN_VALUE; // 100
 		int index = 0;
 		int topObjectIndex = -1;
 //		BasicObject topObejct = null;
 		for (BasicObject object : objectList) {
-			if(object.clickInObject(e.getX(), e.getY())) {
-				if (object.GetDepth() > minDepth) {
+			if (object.clickInObject(e.getX(), e.getY())) {
+				if (object.getDepth() > minDepth) {
 					topObjectIndex = index;
 //					topObejct = object;
-					minDepth = object.GetDepth();
+					minDepth = object.getDepth();
 				}
 			}
 			index++;
@@ -248,6 +253,21 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 			index++;
 		}
 		return -1;
+	}
+
+	public int getIndexOfTheBiggestDepth(ArrayList<BasicObject> objectList) {
+		int index = 0;
+		int theIndex = -1;
+		int maxDepth = Integer.MIN_VALUE;
+
+		for (BasicObject object : objectList) {
+			if (object.getIsGroup() && object.getDepth() > maxDepth) {
+				theIndex = index;
+				maxDepth = object.getDepth();
+			}
+			index++;
+		}
+		return theIndex;
 	}
 
 }

@@ -5,16 +5,12 @@ import java.util.ArrayList;
 
 public class CompositeObject extends BasicObject {
 
-	private int layer = 0;
-	private int width = 0;
-	private int height = 0;
-
 	private ArrayList<BasicObject> objectGroup = new ArrayList<BasicObject>();
 
-	public CompositeObject(String type, Canvas canvas, int depth, int layer, int posX, int posY, int width,
+	public CompositeObject(String type, Canvas canvas, int depth, int posX, int posY, int width,
 			int height) {
 		super(type, canvas, depth, posX, posY, width, height);
-		this.layer = layer;
+		super.setIsGroup(true);
 	}
 
 	@Override
@@ -22,13 +18,12 @@ public class CompositeObject extends BasicObject {
 		graphics.drawRect(super.getPosX(), super.getPosY(), super.getWidth(), super.getHeight());
 	}
 
-	public void updatePosition() {
+	protected void updateBound() {
 		int maxX = Integer.MIN_VALUE;
 		int maxY = Integer.MIN_VALUE;
-
 		for (BasicObject object : objectGroup) {
 			if (object.getPosX() < super.getPosX()) {
-				super.setPosX(object.getPosX());				
+				super.setPosX(object.getPosX());
 			}
 			if (object.getPosY() < super.getPosY()) {
 				super.setPosY(object.getPosY());
@@ -43,12 +38,32 @@ public class CompositeObject extends BasicObject {
 		}
 		super.setWidth(maxX - super.getPosX());
 		super.setHeight(maxY - super.getPosY());
-		
-//		System.out.println(super.getPosX());
-//		System.out.println(super.getPosY());
-//		System.out.println(super.getWidth());
-//		System.out.println(super.getHeight());
-		
+		setMembersDis();
+	}
+
+	private void setMembersDis() {
+		for (BasicObject object : objectGroup) {
+			if (!object.getBindingWithGroup()) {
+				object.setDisWithGroup(super.getPosX(), super.getPosY());
+				object.setBindingWithGroup(true);
+			}
+		}
+
+	}
+
+	public void disBindingAllMember() {
+		for (BasicObject object : getObjectGroup()) {
+			object.setBindingWithGroup(false);
+		}
+	}
+
+	@Override
+	protected void updatePosition(int mouseX, int mouseY) {
+		for (BasicObject object : objectGroup) {
+			super.updatePosition(mouseX, mouseY);
+			object.updatePosition(super.getPosX() + object.getDisWithGroup()[0],
+					super.getPosY() + object.getDisWithGroup()[1]);
+		}
 	}
 
 	public void setSelected(boolean flag) {
@@ -65,5 +80,4 @@ public class CompositeObject extends BasicObject {
 	public ArrayList<BasicObject> getObjectGroup() {
 		return objectGroup;
 	}
-
 }

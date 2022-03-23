@@ -20,6 +20,9 @@ public class BasicObject extends AllShape {
 	private int posX, posY;
 	private int width, height;
 	private HashMap<String, Integer[]> fourPart = new HashMap<String, Integer[]>();
+	private int[] disWithGroup = { 0, 0 };
+	private boolean isGroup = false;
+	private boolean bindingWithGroup = false;
 
 	public BasicObject(String type, Canvas canvas, int depth, int posX, int posY, int width, int height) {
 		super(canvas, depth);
@@ -116,6 +119,14 @@ public class BasicObject extends AllShape {
 		this.fourPart.put("right", new Integer[] { posX + width, posY + height / 2 });
 	}
 
+	public boolean getBindingWithGroup() {
+		return bindingWithGroup;
+	}
+
+	public void setBindingWithGroup(boolean flag) {
+		bindingWithGroup = flag;
+	}
+
 	public int getWidth() {
 		return width;
 	}
@@ -148,7 +159,7 @@ public class BasicObject extends AllShape {
 		this.posX = posX;
 	}
 
-	public int GetDepth() {
+	public int getDepth() {
 		return this.depth;
 	}
 
@@ -164,8 +175,24 @@ public class BasicObject extends AllShape {
 		this.seleced = flag;
 	}
 
+	public boolean getIsGroup() {
+		return isGroup;
+	}
+
+	public void setIsGroup(boolean isGroup) {
+		this.isGroup = isGroup;
+	}
+
 	public HashMap<String, Integer[]> getFourPart() {
 		return fourPart;
 	}
 
+	public void setDisWithGroup(int groupX, int groupY) {
+		disWithGroup[0] = getPosX() - groupX;
+		disWithGroup[1] = getPosY() - groupY;
+	}
+
+	public int[] getDisWithGroup() {
+		return disWithGroup;
+	}
 }

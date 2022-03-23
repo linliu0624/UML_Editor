@@ -18,24 +18,21 @@ import javax.swing.BoxLayout;
 public class MenuManager extends JMenuBar {
 	private Canvas canvas;
 	private String[] buttonsName = new String[] { "File", "Edit", "Group", "Ungroup", "Change object name" };
-	private ArrayList<JButton> buttons = new ArrayList<JButton>();
-	private int buttonWidth = 100;
-	private int buttonheight = 20;
-
+	
 	public MenuManager(Canvas canvas) {
 		this.canvas = canvas;
 
 		JMenu menu;
 		JMenuItem menuItem;
 
-		/* --- File menu --- */
+
 		menu = new JMenu(buttonsName[0]);
 		add(menu);
 
-		/* --- Edit menu --- */
+
 		menu = new JMenu(buttonsName[1]);
 		add(menu);
-
+		
 		menuItem = new JMenuItem(buttonsName[4]);
 		menu.add(menuItem);
 		menuItem.addActionListener(new ChangeNameListener());
@@ -103,7 +100,6 @@ public class MenuManager extends JMenuBar {
 
 	class GroupObjectListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			// canvas.addGroup();
 			canvas.GroupObjects();
 		}
 	}
@@ -112,10 +108,6 @@ public class MenuManager extends JMenuBar {
 		public void actionPerformed(ActionEvent e) {
 			changeNameForm();
 		}
-	}
-
-	protected ArrayList<JButton> getAllButton() {
-		return buttons;
 	}
 
 }
