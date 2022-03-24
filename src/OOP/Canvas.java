@@ -11,7 +11,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.Color;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 
 public class Canvas extends JLayeredPane implements MouseListener, MouseMotionListener {
 	// private ToolManager toolManager;
@@ -169,7 +168,7 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 		boolean hasSelected = false;
 
 		for (BasicObject obj : objectList) {
-			if (obj.getSelected()) {
+			if (obj.getSelected() && !obj.getInGroup()) { //TODO 問題來源可能是因為 最上層的group會把所有東西都加進自己裡面 但我們只需要下面那層就好
 				group.addObject(obj);
 				hasSelected = true;
 			}
@@ -182,13 +181,13 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 
 	public void UnGroupObjects() {
 		int index = getIndexOfTheBiggestDepth(objectList);
-//		((CompositeObject) objectList.get(index)).disBindingAllMember();
+		((CompositeObject) objectList.get(index)).setAllMemberNotInGroup();
 //		((CompositeObject) objectList.get(index)).updateBound();
 		objectList.remove(objectList.get(index));
 	}
 
 	public void changeObjName(String name) {
-
+		
 	}
 
 	public int getTopObjectIndex(MouseEvent e) {
@@ -261,7 +260,7 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 		int maxDepth = Integer.MIN_VALUE;
 
 		for (BasicObject object : objectList) {
-			if (object.getIsGroup() && object.getDepth() > maxDepth) {
+			if (object.getIsGroup() && object.getDepth() > maxDepth && object.getSelected()) {
 				theIndex = index;
 				maxDepth = object.getDepth();
 			}

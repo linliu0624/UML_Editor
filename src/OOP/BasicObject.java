@@ -2,18 +2,18 @@ package OOP;
 
 import java.util.HashMap;
 
-import javax.swing.JPanel;
-
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import javax.swing.JTextField;
 
 public class BasicObject extends AllShape {
 	// 0-99
 	// private ImageIcon imageIcon;
 
 	protected Canvas canvas;
+	private JTextField objectNameField;
 	private boolean seleced = false;
 	private String type = "";
 	private int depth;
@@ -22,7 +22,7 @@ public class BasicObject extends AllShape {
 	private HashMap<String, Integer[]> fourPart = new HashMap<String, Integer[]>();
 	private int[] disWithGroup = { 0, 0 };
 	private boolean isGroup = false;
-	private boolean bindingWithGroup = false;
+	private boolean inGroup = false;
 
 	public BasicObject(String type, Canvas canvas, int depth, int posX, int posY, int width, int height) {
 		super(canvas, depth);
@@ -40,6 +40,10 @@ public class BasicObject extends AllShape {
 		this.fourPart.put("left", new Integer[] { this.posX, this.posY + this.height / 2 });
 		this.fourPart.put("bottom", new Integer[] { this.posX + this.width / 2, this.posY + this.height });
 		this.fourPart.put("right", new Integer[] { this.posX + this.width, this.posY + this.height / 2 });
+
+		objectNameField = new JTextField();
+		objectNameField.setBounds((int) getPosX() + 10, (int) getPosY() + 10, 100, 20);
+		objectNameField.setText("");
 	}
 
 	@Override
@@ -118,13 +122,14 @@ public class BasicObject extends AllShape {
 		this.fourPart.put("bottom", new Integer[] { posX + width / 2, posY + height });
 		this.fourPart.put("right", new Integer[] { posX + width, posY + height / 2 });
 	}
+	
 
-	public boolean getBindingWithGroup() {
-		return bindingWithGroup;
+	protected boolean getInGroup() {
+		return inGroup;
 	}
 
-	public void setBindingWithGroup(boolean flag) {
-		bindingWithGroup = flag;
+	protected void setInGroup(boolean flag) {
+		inGroup = flag;
 	}
 
 	public int getWidth() {

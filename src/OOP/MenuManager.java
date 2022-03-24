@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -50,7 +49,7 @@ public class MenuManager extends JMenuBar {
 	}
 
 	private void changeNameForm() {
-		JFrame inputTextFrame = new JFrame("Change Object Name");
+		JFrame inputTextFrame = new JFrame("Object Name");
 		inputTextFrame.setSize(400, 100);
 		inputTextFrame.getContentPane().setLayout(new GridLayout(0, 1));
 

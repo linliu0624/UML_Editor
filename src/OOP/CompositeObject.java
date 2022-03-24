@@ -15,7 +15,7 @@ public class CompositeObject extends BasicObject {
 
 	@Override
 	protected void paintShape(Graphics graphics) {
-		graphics.drawRect(super.getPosX(), super.getPosY(), super.getWidth(), super.getHeight());
+//		graphics.drawRect(super.getPosX(), super.getPosY(), super.getWidth(), super.getHeight());
 	}
 
 	protected void updateBound() {
@@ -38,28 +38,29 @@ public class CompositeObject extends BasicObject {
 		}
 		super.setWidth(maxX - super.getPosX());
 		super.setHeight(maxY - super.getPosY());
-		setMembersDis();
+		setMembersDis(super.getPosX(), super.getPosY());
 	}
 
-	private void setMembersDis() {
-		for (BasicObject object : objectGroup) {
-			if (!object.getBindingWithGroup()) {
-				object.setDisWithGroup(super.getPosX(), super.getPosY());
-				object.setBindingWithGroup(true);
+	private void setMembersDis(int x, int y) {
+		for (BasicObject object : getObjectGroup()) {
+			if (!object.getInGroup()) {
+				object.setDisWithGroup(x, y);
+				object.setInGroup(true);
 			}
 		}
 
 	}
 
-	public void disBindingAllMember() {
+	public void setAllMemberNotInGroup() {
 		for (BasicObject object : getObjectGroup()) {
-			object.setBindingWithGroup(false);
+			object.setInGroup(false);
+			System.out.println(object.getDepth());
 		}
 	}
 
 	@Override
 	protected void updatePosition(int mouseX, int mouseY) {
-		for (BasicObject object : objectGroup) {
+		for (BasicObject object : getObjectGroup()) {
 			super.updatePosition(mouseX, mouseY);
 			object.updatePosition(super.getPosX() + object.getDisWithGroup()[0],
 					super.getPosY() + object.getDisWithGroup()[1]);
@@ -68,7 +69,7 @@ public class CompositeObject extends BasicObject {
 
 	public void setSelected(boolean flag) {
 		super.setSelected(flag);
-		for (BasicObject object : objectGroup) {
+		for (BasicObject object : getObjectGroup()) {
 			object.setSelected(flag);
 		}
 	}
