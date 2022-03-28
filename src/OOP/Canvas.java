@@ -25,6 +25,7 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	private String startPart;
 	private String endPart;
 	private int selectedObjectIndex = -1;
+	private BasicObject selectedObject = null;
 	private boolean draggAble = false;
 	private int[] mouseEnterPos;
 	private int[] mouseExitPos;
@@ -66,13 +67,17 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 					obj.setSelected(false);
 				}
 				selectedObjectIndex = -1;
+				selectedObject = null;
 			} else {
 				for (BasicObject obj : objectList) {
 					obj.setSelected(false);
 				}
-				objectList.get(getTopObjectIndex(e)).setSelected(true);
-				System.out.println("Depth: " + objectList.get(getTopObjectIndex(e)).getDepth());
+//				objectList.get(getTopObjectIndex(e)).setSelected(true);
 				selectedObjectIndex = getTopObjectIndex(e);
+				selectedObject = objectList.get(getTopObjectIndex(e));
+				selectedObject.setSelected(true);
+				System.out.println("Depth: " + objectList.get(getTopObjectIndex(e)).getDepth());
+
 			}
 
 		} else if (toolManager.getCurrentMode() == "class" || toolManager.getCurrentMode() == "use_case") {
@@ -168,7 +173,7 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 		boolean hasSelected = false;
 
 		for (BasicObject obj : objectList) {
-			if (obj.getSelected() && !obj.getInGroup()) { //TODO 拜肈ㄓ方琌 程糷group穦р┮Τ狥﹁常秈柑 и惠璶ê糷碞
+			if (obj.getSelected() && !obj.getInGroup()) { // TODO 拜肈ㄓ方琌 程糷group穦р┮Τ狥﹁常秈柑 и惠璶ê糷碞
 				group.addObject(obj);
 				hasSelected = true;
 			}
@@ -187,7 +192,8 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	}
 
 	public void changeObjName(String name) {
-		
+		selectedObject.changeName(name);
+		mainFrame.repaint();
 	}
 
 	public int getTopObjectIndex(MouseEvent e) {
@@ -253,7 +259,21 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 		}
 		return -1;
 	}
-
+	public int getMoustOnObjectIndex(MouseEvent e) {
+		int index = 0;
+		int theIndex = -1;
+		int maxDepth = Integer.MIN_VALUE;
+		for (BasicObject object : objectList) {
+			if (object.getPosX() < e.getX() && object.getPosX() + object.getWidth() > e.getX()
+					&& object.getPosY() < e.getY() && object.getPosY() + object.getHeight() > e.getY()
+					&& object.getDepth() > maxDepth) {
+				theIndex = index;
+				maxDepth = object.getDepth();
+			}
+			index++;
+		}
+		return theIndex;
+	}
 	public int getIndexOfTheBiggestDepth(ArrayList<BasicObject> objectList) {
 		int index = 0;
 		int theIndex = -1;
