@@ -6,14 +6,14 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import javax.swing.JTextField;
+import java.awt.Font;
 
 public class BasicObject extends AllShape {
 	// 0-99
 	// private ImageIcon imageIcon;
 
 	protected Canvas canvas;
-	private JTextField objectNameField;
+	private String objectName = "name";
 	private boolean seleced = false;
 	private String type = "";
 	private int depth;
@@ -40,10 +40,6 @@ public class BasicObject extends AllShape {
 		this.fourPart.put("left", new Integer[] { this.posX, this.posY + this.height / 2 });
 		this.fourPart.put("bottom", new Integer[] { this.posX + this.width / 2, this.posY + this.height });
 		this.fourPart.put("right", new Integer[] { this.posX + this.width, this.posY + this.height / 2 });
-
-		objectNameField = new JTextField();
-		objectNameField.setBounds((int) getPosX() + 10, (int) getPosY() + 10, 100, 20);
-		objectNameField.setText("");
 	}
 
 	@Override
@@ -62,9 +58,12 @@ public class BasicObject extends AllShape {
 			graphics2d.drawRect(posX, posY, width, height);
 			graphics2d.drawLine(posX, posY + height / 3, posX + width, posY + height / 3);
 			graphics2d.drawLine(posX, posY + height * 2 / 3, posX + width, posY + height * 2 / 3);
+			drawFont(graphics2d, 10, 8);
+
 		} else if (type.equals("use_case")) {
 			graphics2d.setStroke(new BasicStroke(3));
 			graphics2d.drawOval(posX, posY, width, height);
+			drawFont(graphics2d, 8, 2);
 		}
 
 		if (seleced) {
@@ -82,13 +81,24 @@ public class BasicObject extends AllShape {
 			graphics2d.drawLine(fourPart.get("right")[0], fourPart.get("right")[1], fourPart.get("right")[0],
 					fourPart.get("right")[1]);
 		}
+
 	}
+
 //		};
 //		panel.setBounds(posX, posY, width, height);
 //		panel.setBackground(new Color(255, 255, 255));
 //		panel.setLayout(null);
 //		panel.setVisible(true);
 //	}
+	private void drawFont(Graphics2D graphics2d, int perWidth, int perHeight) {
+		Font font = new Font(Font.DIALOG, Font.BOLD, 14);
+		graphics2d.setFont(font);
+		graphics2d.drawString(objectName, getPosX() + width / perWidth, getPosY() + height / perHeight);
+	}
+
+	public void changeName(String name) {
+		this.objectName = name;
+	}
 
 	public String getClosedPart(int mouseX, int mouseY) {
 		String closedPart = null;
@@ -122,7 +132,6 @@ public class BasicObject extends AllShape {
 		this.fourPart.put("bottom", new Integer[] { posX + width / 2, posY + height });
 		this.fourPart.put("right", new Integer[] { posX + width, posY + height / 2 });
 	}
-	
 
 	protected boolean getInGroup() {
 		return inGroup;
