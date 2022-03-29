@@ -153,6 +153,11 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (toolManager.getCurrentMode().equals("select")) {
+//			BasicObject dragedObject = getMoustOnObjectIndex(e);
+//			if (dragedObject != null) {
+//				dragedObject.updatePosition(e.getX(), e.getY());
+//				mainFrame.repaint();
+//			} 
 			if (draggAble) {
 				objectList.get(selectedObjectIndex).updatePosition(e.getX(), e.getY());
 				mainFrame.repaint();
@@ -249,31 +254,30 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	public int getMouseOnSelectedObjectIndex(MouseEvent e) {
 		int index = 0;
 		for (BasicObject object : objectList) {
-			if (object.getSelected()) {
-				if (object.getPosX() < e.getX() && object.getPosX() + object.getWidth() > e.getX()
-						&& object.getPosY() < e.getY() && object.getPosY() + object.getHeight() > e.getY()) {
-					return index;
-				}
+			if (object.getSelected() && object.clickInObject(e.getX(), e.getY())) {
+				return index;
 			}
 			index++;
 		}
 		return -1;
 	}
-	public int getMoustOnObjectIndex(MouseEvent e) {
+
+	public BasicObject getMoustOnObjectIndex(MouseEvent e) {
 		int index = 0;
 		int theIndex = -1;
 		int maxDepth = Integer.MIN_VALUE;
 		for (BasicObject object : objectList) {
-			if (object.getPosX() < e.getX() && object.getPosX() + object.getWidth() > e.getX()
-					&& object.getPosY() < e.getY() && object.getPosY() + object.getHeight() > e.getY()
-					&& object.getDepth() > maxDepth) {
+//			object.setSelected(false);
+			if (object.clickInObject(e.getX(), e.getY()) && object.getDepth() > maxDepth) {
 				theIndex = index;
 				maxDepth = object.getDepth();
 			}
 			index++;
 		}
-		return theIndex;
+//		objectList.get(theIndex).setSelected(true);
+		return objectList.get(theIndex);
 	}
+
 	public int getIndexOfTheBiggestDepth(ArrayList<BasicObject> objectList) {
 		int index = 0;
 		int theIndex = -1;
@@ -286,6 +290,7 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 			}
 			index++;
 		}
+
 		return theIndex;
 	}
 
