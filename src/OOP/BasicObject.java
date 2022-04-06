@@ -56,6 +56,11 @@ public class BasicObject extends AllShape {
 			graphics2d.setStroke(new BasicStroke(3));
 			graphics2d.setColor(Color.black);
 			graphics2d.drawRect(posX, posY, width, height);
+//			int[] xPoints = { posX+1, posX + width, posX + width, posX+1 };
+//			int[] yPoints = { posY+1, posY+1, posY + height, posY + height };
+//			graphics2d.setColor(Color.yellow);
+//			graphics2d.fillPolygon(xPoints, yPoints, 4);
+//			graphics2d.setColor(Color.black);
 			graphics2d.drawLine(posX, posY + height / 3, posX + width, posY + height / 3);
 			graphics2d.drawLine(posX, posY + height * 2 / 3, posX + width, posY + height * 2 / 3);
 			drawFont(graphics2d, 10, 8);
@@ -63,6 +68,9 @@ public class BasicObject extends AllShape {
 		} else if (type.equals("use_case")) {
 			graphics2d.setStroke(new BasicStroke(3));
 			graphics2d.drawOval(posX, posY, width, height);
+//			graphics2d.setColor(Color.yellow);
+//			graphics2d.fillOval(posX, posY, width, height);
+//			graphics2d.setColor(Color.black);
 			drawFont(graphics2d, 8, 2);
 		}
 

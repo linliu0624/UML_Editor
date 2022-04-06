@@ -62,23 +62,23 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 		System.out.println(e.getY());
 		BasicObject basicObject = null;
 		if (toolManager.getCurrentMode() == "select") {
-			if (getTopObjectIndex(e) == -1) {
-				for (BasicObject obj : objectList) {
-					obj.setSelected(false);
-				}
-				selectedObjectIndex = -1;
-				selectedObject = null;
-			} else {
-				for (BasicObject obj : objectList) {
-					obj.setSelected(false);
-				}
-//				objectList.get(getTopObjectIndex(e)).setSelected(true);
-				selectedObjectIndex = getTopObjectIndex(e);
-				selectedObject = objectList.get(getTopObjectIndex(e));
-				selectedObject.setSelected(true);
-				System.out.println("Depth: " + objectList.get(getTopObjectIndex(e)).getDepth());
-
-			}
+//			if (getTopObjectIndex(e) == -1) {
+//				for (BasicObject obj : objectList) {
+//					obj.setSelected(false);
+//				}
+//				selectedObjectIndex = -1;
+//				selectedObject = null;
+//			} else {
+//				for (BasicObject obj : objectList) {
+//					obj.setSelected(false);
+//				}
+////				objectList.get(getTopObjectIndex(e)).setSelected(true);
+//				selectedObjectIndex = getTopObjectIndex(e);
+//				selectedObject = objectList.get(getTopObjectIndex(e));
+//				selectedObject.setSelected(true);
+//				System.out.println("Depth: " + objectList.get(getTopObjectIndex(e)).getDepth());
+//
+//			}
 
 		} else if (toolManager.getCurrentMode() == "class" || toolManager.getCurrentMode() == "use_case") {
 			basicObject = new BasicObject(toolManager.getCurrentMode(), this, depth, e.getX(), e.getY(), 100, 100);
@@ -104,6 +104,24 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	public void mousePressed(MouseEvent e) {
 		mouseEnterPos = new int[] { e.getX(), e.getY() };
 		if (toolManager.getCurrentMode().equals("select")) {
+			if (getTopObjectIndex(e) == -1) {
+				for (BasicObject obj : objectList) {
+					obj.setSelected(false);
+				}
+				selectedObjectIndex = -1;
+				selectedObject = null;
+			} else {
+				for (BasicObject obj : objectList) {
+					obj.setSelected(false);
+				}
+//				objectList.get(getTopObjectIndex(e)).setSelected(true);
+				selectedObjectIndex = getTopObjectIndex(e);
+				selectedObject = objectList.get(getTopObjectIndex(e));
+				selectedObject.setSelected(true);
+				System.out.println("Depth: " + objectList.get(getTopObjectIndex(e)).getDepth());
+
+			}
+
 			if (getMouseOnSelectedObjectIndex(e) != -1) {
 				draggAble = true;
 			} else {
@@ -192,8 +210,22 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 	public void UnGroupObjects() {
 		int index = getIndexOfTheBiggestDepth(objectList);
 		((CompositeObject) objectList.get(index)).setAllMemberNotInGroup();
-//		((CompositeObject) objectList.get(index)).updateBound();
 		objectList.remove(objectList.get(index));
+
+// 只有唯一選擇可以ungroup
+//		int counter = 0;
+//		int i = 0;
+//		for (BasicObject object : objectList) {
+//			if (object.getSelected() && object.getIsGroup() && !object.getInGroup()) {
+//				index = i;
+//				counter++;
+//			}
+//			i++;
+//		}
+//		if (counter < 2) {
+//			((CompositeObject) objectList.get(index)).setAllMemberNotInGroup();
+//			objectList.remove(objectList.get(index));
+//		}
 	}
 
 	public void changeObjName(String name) {
