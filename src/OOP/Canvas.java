@@ -1,6 +1,7 @@
 package OOP;
 
 import java.util.ArrayList;
+import java.util.EventListener;
 
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
@@ -12,35 +13,32 @@ import java.awt.Color;
 
 import java.awt.Graphics;
 
-public class Canvas extends JLayeredPane implements MouseListener, MouseMotionListener {
+public class Canvas extends JLayeredPane{
 	// private ToolManager toolManager;
 	private ArrayList<BasicObject> objectList = new ArrayList<BasicObject>();
 	private ArrayList<BasicLine> basicLineList = new ArrayList<BasicLine>();
 
 	private JFrame mainFrame;
-	private ToolManager toolManager;
-	private int depth = 0;
+	private int depthCounter = 0;
 	private BasicObject startObject = null;
 	private BasicObject endObject = null;
 	private String startPart;
 	private String endPart;
 	private int selectedObjectIndex = -1;
 	private BasicObject selectedObject = null;
-	private boolean draggAble = false;
+	private boolean dragable = false;
 	private int[] mouseEnterPos;
 	private int[] mouseExitPos;
+	private ToolMode toolMode = null;
 
-	public Canvas(JFrame mainFrame, ToolManager toolManager, int[] bgRGBColor, int posX, int posY, int width,
-			int height) {
+	public Canvas(JFrame mainFrame, int[] bgRGBColor, int posX, int posY, int width, int height) {
 		super();
 		this.mainFrame = mainFrame;
-		this.toolManager = toolManager;
+//		this.toolManager = toolManager;
 
 		this.setLayout(null);
 		this.setOpaque(true);
 		this.setBackground(new Color(bgRGBColor[0], bgRGBColor[1], bgRGBColor[2])); // 206, 232, 255
-		this.addMouseListener(this);
-		this.addMouseMotionListener(this);
 		this.setBounds(posX, posY, width, height);
 	}
 
@@ -56,142 +54,10 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 		}
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		System.out.println(e.getX());
-		System.out.println(e.getY());
-		BasicObject basicObject = null;
-		if (toolManager.getCurrentMode() == "select") {
-//			if (getTopObjectIndex(e) == -1) {
-//				for (BasicObject obj : objectList) {
-//					obj.setSelected(false);
-//				}
-//				selectedObjectIndex = -1;
-//				selectedObject = null;
-//			} else {
-//				for (BasicObject obj : objectList) {
-//					obj.setSelected(false);
-//				}
-////				objectList.get(getTopObjectIndex(e)).setSelected(true);
-//				selectedObjectIndex = getTopObjectIndex(e);
-//				selectedObject = objectList.get(getTopObjectIndex(e));
-//				selectedObject.setSelected(true);
-//				System.out.println("Depth: " + objectList.get(getTopObjectIndex(e)).getDepth());
-//
-//			}
-
-		} else if (toolManager.getCurrentMode() == "class" || toolManager.getCurrentMode() == "use_case") {
-			basicObject = new BasicObject(toolManager.getCurrentMode(), this, depth, e.getX(), e.getY(), 100, 100);
-			objectList.add(basicObject);
-			depth++;
-		}
-		mainFrame.revalidate();
-		mainFrame.repaint();
-//		basicObject.drawOnCanvas();
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		mouseEnterPos = new int[] { e.getX(), e.getY() };
-		if (toolManager.getCurrentMode().equals("select")) {
-			if (getTopObjectIndex(e) == -1) {
-				for (BasicObject obj : objectList) {
-					obj.setSelected(false);
-				}
-				selectedObjectIndex = -1;
-				selectedObject = null;
-			} else {
-				for (BasicObject obj : objectList) {
-					obj.setSelected(false);
-				}
-//				objectList.get(getTopObjectIndex(e)).setSelected(true);
-				selectedObjectIndex = getTopObjectIndex(e);
-				selectedObject = objectList.get(getTopObjectIndex(e));
-				selectedObject.setSelected(true);
-				System.out.println("Depth: " + objectList.get(getTopObjectIndex(e)).getDepth());
-
-			}
-
-			if (getMouseOnSelectedObjectIndex(e) != -1) {
-				draggAble = true;
-			} else {
-				draggAble = false;
-
-			}
-		} else if (toolManager.getCurrentMode().equals("association_line")
-				|| toolManager.getCurrentMode().equals("generalization_line")
-				|| toolManager.getCurrentMode().equals("composition_line")) {
-			startObject = getTopObjectIndex(e) == -1 ? null : objectList.get(getTopObjectIndex(e));
-			if (startObject != null)
-				startPart = startObject.getClosedPart(e.getX(), e.getY());
-		}
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		mouseExitPos = new int[] { e.getX(), e.getY() };
-
-		if (toolManager.getCurrentMode().equals("select")) {
-			SelectManyObjects(e);
-			mainFrame.repaint();
-		} else if (toolManager.getCurrentMode().equals("association_line")
-				|| toolManager.getCurrentMode().equals("generalization_line")
-				|| toolManager.getCurrentMode().equals("composition_line")) {
-			endObject = getTopObjectIndex(e) == -1 ? null : objectList.get(getTopObjectIndex(e));
-			if (endObject != null && startObject != null && startObject != endObject
-					&& startObject.getIsGroup() == false && endObject.getIsGroup() == false) {
-				// draw line
-				endPart = endObject.getClosedPart(e.getX(), e.getY());
-				if (toolManager.getCurrentMode().equals("association_line")) {
-					basicLineList.add(new AssociationLine(this, depth, startObject, endObject, startPart, endPart));
-				} else if (toolManager.getCurrentMode().equals("generalization_line")) {
-					basicLineList.add(new GeneralizationLine(this, depth, startObject, endObject, startPart, endPart));
-				} else if (toolManager.getCurrentMode().equals("composition_line")) {
-					basicLineList.add(new CompositionLine(this, depth, startObject, endObject, startPart, endPart));
-				}
-				depth++;
-				mainFrame.repaint();
-			} else {
-				System.out.println("release start: " + startObject);
-				System.out.println("release end: " + endObject);
-			}
-		}
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		if (toolManager.getCurrentMode().equals("select")) {
-//			BasicObject dragedObject = getMoustOnObjectIndex(e);
-//			if (dragedObject != null) {
-//				dragedObject.updatePosition(e.getX(), e.getY());
-//				mainFrame.repaint();
-//			} 
-			if (draggAble) {
-				objectList.get(selectedObjectIndex).updatePosition(e.getX(), e.getY());
-				mainFrame.repaint();
-			}
-		}
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-
-	}
-
 	public void GroupObjects() {
-		CompositeObject group = new CompositeObject("", this, depth, Integer.MAX_VALUE, Integer.MAX_VALUE,
+		CompositeObject group = new CompositeObject("", this, depthCounter, Integer.MAX_VALUE, Integer.MAX_VALUE,
 				Integer.MIN_VALUE, Integer.MIN_VALUE);
-		depth++;
+		depthCounter++;
 
 		boolean hasSelected = false;
 
@@ -268,7 +134,7 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 			mouseExitPos[1] = enterY;
 		}
 		int i = 0;
-		if (!draggAble) {
+		if (!dragable) {
 			for (BasicObject object : objectList) {
 				if (object.getPosX() > mouseEnterPos[0] && object.getPosX() + object.getWidth() < mouseExitPos[0]
 						&& object.getPosY() > mouseEnterPos[1]
@@ -326,4 +192,103 @@ public class Canvas extends JLayeredPane implements MouseListener, MouseMotionLi
 		return theIndex;
 	}
 
+	public void setCurrentMode(ToolMode mode) {
+		removeMouseListener((MouseListener) toolMode);
+		removeMouseMotionListener((MouseMotionListener) toolMode);
+		this.toolMode = mode;
+		addMouseListener((MouseListener) toolMode);
+		addMouseMotionListener((MouseMotionListener) toolMode);
+	}
+
+	public void mainFrameRepaint() {
+		mainFrame.repaint();
+	}
+
+	public ArrayList<BasicObject> getObjectList() {
+		return objectList;
+	}
+
+	public ArrayList<BasicLine> getBasicLineList() {
+		return basicLineList;
+	}
+
+	public int getDepthCounter() {
+		return depthCounter;
+	}
+
+	public void setDepthCounter() {
+		depthCounter++;
+	}
+
+	public void setSelectedObject(BasicObject object) {
+		selectedObject = object;
+	}
+
+	public BasicObject getSelectedObject() {
+		return selectedObject;
+	}
+
+	public int getSelectedObjectIndex() {
+		return selectedObjectIndex;
+	}
+
+	public void setSelectedObjectIndex(int index) {
+		selectedObjectIndex = index;
+	}
+
+	public boolean isDragable() {
+		return dragable;
+	}
+
+	public void setDragable(boolean flag) {
+		dragable = flag;
+	}
+
+	public void setMouseEnterPos(int x, int y) {
+		mouseEnterPos = new int[] { x, y };
+	}
+
+	public int[] getMouseEnterPos() {
+		return mouseEnterPos;
+	}
+
+	public void setmouseExitPos(int x, int y) {
+		mouseExitPos = new int[] { x, y };
+	}
+
+	public int[] getmouseExitPos() {
+		return mouseExitPos;
+	}
+
+	public BasicObject getStartObject() {
+		return startObject;
+	}
+
+	public void setStartObject(BasicObject object) {
+		startObject = object;
+	}
+
+	public BasicObject getEndObject() {
+		return endObject;
+	}
+
+	public void setEndObject(BasicObject object) {
+		endObject = object;
+	}
+
+	public void setStartPart(String port) {
+		startPart = port;
+	}
+
+	public String getStartPart() {
+		return startPart;
+	}
+
+	public void setEndPart(String port) {
+		endPart = port;
+	}
+
+	public String getEndPart() {
+		return endPart;
+	}
 }

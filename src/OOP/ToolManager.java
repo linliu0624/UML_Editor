@@ -12,80 +12,75 @@ import javax.swing.JButton;
 import javax.swing.ImageIcon;
 
 public class ToolManager {
-    // private Box toolBox;
-    private ArrayList<JButton> buttons = new ArrayList<JButton>();
-    private String currentMode = "";
-    private int buttonSize;
+	private static final String[] buttonIconFiles = new String[] { "select", "association_line", "generalization_line",
+			"composition_line", "class", "use_case" };
 
-    // constructor
-    public ToolManager(String[] buttonsName, int posX, int posY, int buttonSize) {
-        // this.toolBox = Box.createVerticalBox();
-        // toolBox.setBounds(posX, posY, width, height);
-        this.buttonSize = buttonSize;
-        for (int i = 0; i < buttonsName.length; i++) {
+	private Canvas canvas;
+	private ArrayList<JButton> buttons = new ArrayList<JButton>();
+	private ArrayList<ToolMode> modeList = new ArrayList<ToolMode>();
+	private int buttonSize;
+	JButton theButton = null;
 
-            JButton button = new JButton(buttonIcon(buttonsName[i]));
-            button.setName(buttonsName[i]);
-            button.setBounds(posX, posY + buttonSize * i, buttonSize, buttonSize);
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    onClick(e);
-                }
+	// constructor
+	public ToolManager(Canvas canvas, int posX, int posY, int buttonSize) {
+		this.buttonSize = buttonSize;
+		this.canvas = canvas;
 
-            });
-            buttons.add(button);
-            // toolBox.add(button);
-            // toolBox.add(Box.createVerticalStrut(5));
-        }
-    }
+		modeList.add(new SelectMode(this.canvas));
+		modeList.add(new CreateLineMode(this.canvas));
+		modeList.add(new CreateLineMode(this.canvas));
+		modeList.add(new CreateLineMode(this.canvas));
+		modeList.add(new CreateBasicObjectMode(this.canvas));
+		modeList.add(new CreateBasicObjectMode(this.canvas));
 
-    public String getCurrentMode() {
-        return currentMode;
-    }
+		for (int i = 0; i < buttonIconFiles.length; i++) {
+			ToolButton button = new ToolButton(buttonIconFiles[i], buttonIcon(buttonIconFiles[i]), modeList.get(i),
+					posX, posY + buttonSize * i, buttonSize);
+			modeList.get(i).setModeType(buttonIconFiles[i]);
+			buttons.add(button);
+		}
+	}
 
-    // public void setCurrentMode(String currentMode) {
-    // this.currentMode = currentMode;
-    // }
+	protected ArrayList<JButton> getAllButton() {
+		return buttons;
+	}
 
-    private ImageIcon buttonIcon(String buttonName) {
-        ImageIcon imgIcon = new ImageIcon(
-                Objects.requireNonNull(getClass().getResource("png/" + buttonName + ".png")));
-        Image img = imgIcon.getImage();
-        img = img.getScaledInstance(buttonSize - 15, buttonSize - 15, Image.SCALE_SMOOTH);
-        imgIcon = new ImageIcon(img);
-        return imgIcon;
-    }
+	private ImageIcon buttonIcon(String buttonName) {
+		ImageIcon imgIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("png/" + buttonName + ".png")));
+		Image img = imgIcon.getImage();
+		img = img.getScaledInstance(buttonSize - 15, buttonSize - 15, Image.SCALE_SMOOTH);
+		imgIcon = new ImageIcon(img);
+		return imgIcon;
+	}
 
-    private void onClick(ActionEvent e) {
-        JButton theButton = (JButton) e.getSource();
-        String lastMode = "";
-        if (getCurrentMode().equals("")) {
-            // setCurrentMode(theButton.getName());
-            currentMode = theButton.getName();
-            theButton.setBackground(Color.gray);
-            lastMode = theButton.getName();
-        } else if (getCurrentMode().equals(theButton.getName())) {
-            // setCurrentMode("");
-            currentMode = "";
-            theButton.setBackground(null);
-        } else {
-            for (JButton button : buttons) {
-                if (!button.getName().equals(lastMode)) {
-                    button.setBackground(null);
-                }
-            }
-            // setCurrentMode(theButton.getName());
-            currentMode = theButton.getName();
-            theButton.setBackground(Color.gray);
-        }
-        System.out.println(getCurrentMode());
-    }
+	private class ToolButton extends JButton {
+		ToolMode mode;
 
-    protected ArrayList<JButton> getAllButton() {
-        return buttons;
-    }
-    // protected Box getToolBox() {
-    // return this.toolBox;
-    // }
+		public ToolButton(String name, ImageIcon icon, ToolMode mode, int posX, int posY, int size) {
+			this.mode = mode;
+			setName(name);
+			setBounds(posX, posY, size, size);
+			setIcon(icon);
+			setBackground(Color.white);
+			addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					buttonChangeColor(e);
+					canvas.setCurrentMode(mode);
+				}
+			});
+		}
+
+		private void buttonChangeColor(ActionEvent e) {
+			if (theButton != null) {
+				theButton.setBackground(Color.white);
+			}
+			theButton = (JButton) e.getSource();
+			theButton.setBackground(Color.gray);
+			System.out.println(mode.getModeType());
+		}
+	}
+	// protected Box getToolBox() {
+	// return this.toolBox;
+	// }
 }
